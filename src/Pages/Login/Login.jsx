@@ -11,6 +11,7 @@ import auth from "../../Firebase/Firebase.config";
 import { Link, useLocation, useNavigate } from "react-router";
 import { Helmet } from "react-helmet-async";
 import Swal from "sweetalert2";
+import SocialLogin from "../../components/SocialLogin/SocialLogin";
 
 const Login = () => {
   const navigate = useNavigate()
@@ -87,9 +88,9 @@ useEffect(() => {
           <title>Bistro Boss | Login</title>
      </Helmet>
          <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-      <div className="max-w-4xl w-full bg-white shadow-md rounded-lg flex flex-col md:flex-row overflow-hidden">
+      <div className="max-w-4xl w-full bg-white shadow-md rounded-lg flex flex-col md:flex-row overflow-hidden pb-4 px-8">
         {/* Login Form */}
-        <div className="w-full md:w-1/2 p-8">
+        <div className="w-full md:w-1/2 p-8 px-10">
           <h2 className="text-2xl font-bold text-gray-800 mb-4 text-center">
             Welcome Back!
           </h2>
@@ -158,8 +159,9 @@ useEffect(() => {
             </button>
           </form>
             <p><small>New Here? <Link to="/register">Create an account</Link></small></p>
-        
+            <SocialLogin></SocialLogin>
         </div>
+        
       </div>
     </div>
      </>

@@ -6,19 +6,27 @@ import { Link, useLocation, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { Helmet } from "react-helmet-async";
 import { FaGoogle } from "react-icons/fa";
+import useAxiosOpen from "../../components/hooks/useAxiosOpen";
+import Swal from "sweetalert2";
+import { updateProfile } from "firebase/auth";
+import auth from "../../Firebase/Firebase.config";
+import SocialLogin from "../../components/SocialLogin/SocialLogin";
 
 const Register = () => {
 
   const navigate = useNavigate()
   const location = useLocation()
+  const axiosPublic = useAxiosOpen()
 
     const {
         register,
         handleSubmit,
+        reset,
         formState: { errors },
+        
       } = useForm();
 
-    const {registerWithEmail,loading,loginWithGoogle} = useContext(AuthContext)
+    const {registerWithEmail,loading,loginWithGoogle,updateUserProfile} = useContext(AuthContext)
 
     
 
@@ -27,27 +35,42 @@ const Register = () => {
   const onSubmit = (data) => {
          console.log(data)
     registerWithEmail(data.email,data.password)
+
     .then(result =>{
         const loggedUser = result.user;
         console.log(loggedUser)
-    })
-    .catch(error => {
-        console.log('error ashce ', error)
+        updateUserProfile(data.name, data.photoURL)
+        .then(() => {
+            // create user entry in the database
+            const userInfo = {
+                name: data.name,
+                email: data.email
+            }
+            axiosPublic.post('/users', userInfo)
+                .then(res => {
+                    if (res.data.insertedId) {
+                        console.log('user added to the database')
+                        reset();
+                        Swal.fire({
+                          position: 'top-end',
+                          icon: 'success',
+                          title: 'User created successfully.',
+                          showConfirmButton: false,
+                          timer: 1500
+                      });
+                      navigate('/');
+                  }
+              })
 
-    })
-  };
 
-  const handleLoginWithGoogle = () => {
-    loginWithGoogle()
-    .then(result => {
-      console.log(result.user)
-      navigate(from,{replace:true});
-    })
-    .catch(error => {
-      console.log(error)
-    })
-  }
+      })
+      .catch(error => console.log(error))
+})
+};
 
+
+
+ 
  
 
   return (
@@ -147,8 +170,7 @@ const Register = () => {
             </button>
           </form>
           <p><small>Already registered? Go to <Link to="/login" className="underline">Log In</Link></small></p>
-          <button onClick={handleLoginWithGoogle} className="btn bg-yellow-500 text-white w-full mx-auto mt-5 "><FaGoogle /> Login with Google</button>
-
+            <SocialLogin></SocialLogin>
         </div>
       </div>
     
